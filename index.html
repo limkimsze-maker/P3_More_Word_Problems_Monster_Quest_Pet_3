@@ -395,6 +395,10 @@
       display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px;
     }
     .rewardPetEmoji{font-size:96px; line-height:1}
+    .rewardPetImg{
+      width:min(100%,260px); height:auto; display:block;
+      filter:drop-shadow(0 12px 20px rgba(15,23,42,.14));
+    }
     .rewardPetName{font-size:32px; font-weight:1000; color:#166534; line-height:1.1}
     .rewardPetHint{font-size:16px; font-weight:1000; color:#15803d; line-height:1.3}
     .rewardSparkle{
@@ -551,9 +555,9 @@
               <div class="rewardSub">You finished all 3 questions.</div>
               <div class="rewardPetStage">
                 <div class="rewardSparkle">✨ ✨ ✨</div>
-                <div class="rewardPetEmoji">🐥</div>
+                <img class="rewardPetImg" src="https://raw.githubusercontent.com/limkimsze-maker/P3_More_Word_Problems_Monster_Quest_Pet_3/64ae3ca5b6c9e941911efbb987af15b1fecc2fa1/3%20pet.png" alt="Stage 3 Pet">
                 <div class="rewardPetName">Stage 3 Pet</div>
-                <div class="rewardPetHint">So cute!</div>
+                <div class="rewardPetHint">It grows much larger wings.</div>
               </div>
               <button class="btn primary" id="btnRewardPlayAgain" type="button">Play Again</button>
             </div>
