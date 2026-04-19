@@ -1,0 +1,1067 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+  <title>Two-Step Word Problem — Jiahao</title>
+
+  <link rel="icon" href="./kimsze_sharp16.ico?v=20260111a" sizes="any">
+  <link rel="shortcut icon" href="./kimsze_sharp16.ico?v=20260111a">
+
+  <script>
+  (function(){
+    const ACTIVITY_ID = 'https://limkimsze-maker.github.io/Two_Step_Word_Problem_Jiahao_20260405/';
+    try{
+      const gone=[];
+      for(let i=0;i<localStorage.length;i++){
+        const k=localStorage.key(i);
+        if(!k) continue;
+        if(k===ACTIVITY_ID || k.startsWith(ACTIVITY_ID+'::') || k.startsWith('sls_scope::'+ACTIVITY_ID) || k.startsWith('UFCO-firstSubmit::'+ACTIVITY_ID) || k.startsWith('sls_unlike_payload::'+ACTIVITY_ID)) gone.push(k);
+      }
+      gone.forEach(k=>localStorage.removeItem(k));
+      sessionStorage.removeItem('UFCO-firstSubmit::'+ACTIVITY_ID);
+      sessionStorage.removeItem('UFCO-lastTs::'+ACTIVITY_ID);
+      try{
+        const bc=new BroadcastChannel('xapi-state');
+        bc.postMessage({type:'clear',activityId:ACTIVITY_ID,ts:Date.now()});
+        bc.close();
+      }catch(e){}
+    }catch(e){}
+    window.__ACTIVITY_ID__ = ACTIVITY_ID;
+  })();
+  </script>
+
+  <script async src="https://cdn.counter.dev/script.js" data-id="825e93b6-ce99-40ef-8bcc-125f13297433" data-utcoffset="8"></script>
+
+  <style>
+    :root{
+      --bg:#eef2f8;
+      --card:#ffffff;
+      --board:#dbe2f0;
+      --panel:#e7edf7;
+      --ink:#101828;
+      --muted:#5a6780;
+      --line:#182235;
+      --shadow:0 12px 28px rgba(15,23,42,.10);
+      --workspace:#ffffff;
+
+      --barTop:#a8cb33;
+      --barBottom:#f7af1c;
+      --blank:#fff6b8;
+      --blankBorder:#a7b56c;
+      --eqBg:#d7eceb;
+      --good:#dff3e6;
+      --bad:#ffe2e2;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:"Comic Sans MS","Comic Neue","Trebuchet MS",system-ui,sans-serif;
+      color:var(--ink);
+      background:linear-gradient(180deg,#f7f8fb,#eef2f8);
+      overflow:hidden;
+    }
+
+    .app{height:100vh;display:flex;flex-direction:column}
+    .main{
+      flex:1; min-height:0; padding:8px;
+      display:grid; grid-template-columns:minmax(0,2.22fr) minmax(330px,.58fr); gap:10px;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid rgba(16,24,40,.08);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      display:flex; flex-direction:column; min-height:0; overflow:hidden;
+    }
+    .cardHd{
+      flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding:12px 16px; border-bottom:1px solid rgba(16,24,40,.08);
+      font-size:18px; font-weight:1000;
+    }
+
+    .leftBd{flex:1; min-height:0; position:relative; padding:6px; background:#d8dfed; overflow:hidden;}
+    .fitViewport{position:absolute; inset:6px; overflow:hidden;}
+    .fitStage{position:absolute; left:0; top:0; transform-origin:top left;}
+
+    .questionShell{
+      width:1220px; height:810px;
+      border-radius:30px;
+      background:#d3dbea;
+      padding:10px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+      display:grid; grid-template-rows:1fr 72px; gap:8px;
+      overflow:hidden;
+    }
+
+    .boardGrid{
+      width:100%; height:100%;
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      grid-template-rows:320px 1fr;
+      grid-template-areas:
+        "intro intro"
+        "main main";
+      gap:12px;
+      min-height:0;
+      align-items:stretch;
+    }
+
+    .introPanel{grid-area:intro}
+    .mainPanel{grid-area:main}
+    .controlsFrame{display:flex; align-items:start; justify-content:center; position:relative; z-index:5; margin-top:6px;}
+
+    .introPanel, .mainPanel{
+      border-radius:26px;
+      background:rgba(233,238,247,.74);
+      padding:14px 16px;
+      position:relative;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+      overflow:visible;
+    }
+
+    .questionTitleBox{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      background:rgba(244,247,252,.95);
+      border-radius:18px;
+      padding:12px 16px;
+      margin-bottom:12px;
+    }
+    .questionTitleMain{font-size:24px; font-weight:1000; color:#2b6fb5}
+    .questionTitleSub{font-size:12px; font-weight:900; color:#64748b}
+    .questionTag{
+      border:2px solid #c6d8ef; border-radius:16px; padding:8px 14px;
+      font-size:12px; font-weight:1000; color:#2b6fb5; background:#f4f8fd;
+      white-space:nowrap;
+    }
+    .missionCard{
+      margin:0 0 8px; padding:10px 12px; border-radius:18px; background:rgba(244,247,252,.95);
+      box-shadow:0 8px 18px rgba(15,23,42,.05); border:1px solid rgba(16,24,40,.08);
+    }
+    .missionTop{display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;}
+    .missionTitle{font-size:16px; font-weight:1000; color:#1e3a8a}
+    .missionMeta{font-size:11px; font-weight:1000; color:#64748b}
+    .missionBar{
+      margin-top:8px; height:12px; border-radius:999px; background:#e2e8f0; overflow:hidden;
+      box-shadow:inset 0 1px 2px rgba(15,23,42,.08);
+    }
+    .missionFill{
+      height:100%; width:0%; border-radius:999px; background:linear-gradient(90deg,#60a5fa,#34d399);
+      transition:width .25s ease;
+    }
+    .missionBottom{
+      margin-top:8px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:nowrap;
+    }
+    .streakText{font-size:13px; font-weight:1000; color:#92400e}
+    .streakDots{display:flex; gap:6px; align-items:center;}
+    .streakDot{
+      width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+      background:#e2e8f0; border:2px solid #cbd5e1; font-size:14px; transition:transform .18s ease, background .18s ease, border-color .18s ease;
+    }
+    .streakDot.on{background:#fef3c7; border-color:#f59e0b; transform:translateY(-2px)}
+    .problemText{font-size:20px; line-height:1.24; font-weight:1000; padding:0 4px 0;}
+    .problemText .lead{margin-bottom:4px}
+    .opBank{margin-top:8px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; position:relative; z-index:12;}
+    .opBankLabel{font-size:14px; font-weight:1000; color:var(--muted)}
+    .opChip{
+      width:38px; height:38px; border-radius:999px;
+      border:2px solid rgba(16,24,40,.18); background:#fff;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:20px; font-weight:1000; cursor:pointer; user-select:none;
+      box-shadow:0 5px 12px rgba(15,23,42,.06);
+    }
+    .opChip:active{transform:translateY(1px)}
+    .opSlot{
+      width:38px; height:38px; border-radius:999px;
+      border:3px dashed rgba(16,24,40,.25); background:#fff;
+      display:inline-flex; align-items:center; justify-content:center;
+      font-size:20px; font-weight:1000; color:#536071;
+      cursor:pointer; flex:0 0 auto;
+    }
+    .opSlot.filled{border-style:solid; color:var(--ink)}
+
+    .mainInner{
+      height:100%;
+      display:grid;
+      grid-template-columns: 600px 1fr;
+      gap:18px;
+      align-items:start;
+    }
+
+    .middleFrame{
+      height:100%;
+      border-radius:24px;
+      background:rgba(244,247,252,.70);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.35);
+      padding:16px 18px;
+      overflow:hidden;
+    }
+
+    .leftSolve{
+      display:flex; flex-direction:column; gap:18px;
+    }
+    .rightSolve{
+      min-height:100%;
+      border-radius:24px;
+      background:rgba(244,247,252,.82);
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.38);
+      padding:14px 18px 16px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-start;
+      gap:14px;
+    }
+    .rightSolveHeader{
+      font-size:22px;
+      font-weight:1000;
+      margin-bottom:6px;
+    }
+    .rightSolvePrompt{
+      font-size:22px;
+      line-height:1.28;
+      font-weight:1000;
+      margin-bottom:4px;
+    }
+
+    .modelWrap{
+      position:relative; width:100%; height:270px; overflow:hidden; padding-left:128px;
+    }
+    .labelRow{
+      position:absolute; left:0; right:0; top:0; height:44px;
+    }
+    .moneyLabel{
+      position:absolute; transform:translateX(-50%);
+      display:flex; align-items:center; gap:4px;
+      font-size:18px; font-weight:1000;
+    }
+    .moneyLead{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:14px; font-size:20px; font-weight:1000; line-height:1;
+    }
+    .fixedTag{
+      min-width:86px; height:40px; border-radius:12px;
+      border:2px solid var(--blankBorder); background:var(--blank);
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:0 10px; font-size:18px; font-weight:1000;
+      color:#13212f;
+    }
+
+    .barArea{
+      position:absolute; left:0; right:0; top:52px; height:142px;
+    }
+    .barText{
+      position:absolute; left:0; transform:none;
+      width:118px; text-align:right; font-size:24px; font-weight:1000;
+    }
+    .barText.top{top:18px}
+    .barText.bottom{top:92px}
+
+    .braceTop, .braceBottomLeft, .braceBottomRight, .braceSide{
+      position:absolute; overflow:visible;
+    }
+    .braceTop svg, .braceBottomLeft svg, .braceBottomRight svg, .braceSide svg{
+      width:100%; height:100%; display:block;
+    }
+    .braceTop path, .braceBottomLeft path, .braceBottomRight path, .braceSide path{
+      fill:none; stroke:var(--line); stroke-width:3.4; stroke-linecap:round; stroke-linejoin:round;
+    }
+
+    .braceTop{left:178px; top:0; width:352px; height:30px;}
+    .braceBottomLeft{left:178px; top:146px; width:276px; height:30px;}
+    .braceBottomRight{left:454px; top:146px; width:76px; height:30px;}
+    .braceSide{left:538px; top:22px; width:30px; height:138px;}
+
+    .topBar, .bottomBar{
+      position:absolute; left:178px; height:52px; border:3px solid var(--line); background:#fff;
+      display:flex; top:34px;
+    }
+    .topBar{width:352px;}
+    .bottomBar{width:276px; top:104px;}
+
+    .segTopA, .segTopB, .segBottom{
+      height:100%;
+    }
+    .segTopA{width:276px; background:var(--barTop);}
+    .segTopB{width:76px; background:var(--barTop);}
+    .segBottom{width:276px; background:var(--barBottom);}
+
+    .vDash1, .vDash2{
+      position:absolute; top:34px; height:122px; border-left:3px dashed var(--line);
+    }
+    .vDash1{left:454px;}
+    .vDash2{left:530px;}
+
+    .unknownMark, .fixedText{
+      position:absolute; transform:translateX(-50%);
+      font-size:28px; font-weight:1000; line-height:1;
+    }
+    .fixedText{font-size:20px;}
+    .unknownMark.bottomFriday{left:316px; top:176px;}
+    .fixedText.diff{left:492px; top:176px;}
+    .unknownMark.sideTotal{left:572px; top:88px;}
+
+    .steps{
+      display:flex; flex-direction:column; gap:18px;
+    }
+    .eqBox{
+      background:var(--eqBg); border-radius:16px; padding:12px 16px;
+      display:flex; align-items:center; justify-content:center; gap:10px;
+      font-size:24px; font-weight:1000; flex-wrap:nowrap;
+    }
+    .blankInput{
+      width:90px; height:42px; border-radius:11px;
+      border:2px solid var(--blankBorder); background:var(--blank);
+      font:inherit; font-size:18px; font-weight:1000; text-align:center; color:#13212f; outline:none;
+      padding:0 8px;
+    }
+    .blankInput.long{width:116px}
+    .moneyField{display:inline-flex; align-items:center; justify-content:center; gap:4px;}
+    .moneyField .dollar{font-size:22px; font-weight:1000; min-width:14px; text-align:center;}
+    .sentence{font-size:26px; font-weight:1000; line-height:1.34;}
+    .moneyInlineSentence{display:inline-flex; align-items:center; gap:4px; vertical-align:middle;}
+
+    .controlsFrameInner{
+      width:100%;
+      border-radius:22px;
+      border:1px solid rgba(16,24,40,.10);
+      background:rgba(244,247,252,.96);
+      box-shadow:0 8px 18px rgba(15,23,42,.06);
+      padding:10px 14px;
+      display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:nowrap;
+    }
+    .controlsFrameInner .btn{flex:1 1 0;}
+    .btn{
+      border:1px solid rgba(16,24,40,.12); background:#fff; color:#111827;
+      padding:10px 14px; border-radius:16px; font:inherit; font-size:14px; font-weight:1000; cursor:pointer;
+      box-shadow:0 4px 12px rgba(15,23,42,.04);
+      min-width:96px;
+      white-space:nowrap;
+    }
+    .btn.primary{background:#0c1630; color:#fff; border-color:#0c1630}
+    .btn.checkYellow{background:#f5c84d; color:#111827; border-color:#e0b22e}
+    .btn:active{transform:translateY(1px)}
+
+    #workPanelBd{flex:1; min-height:0; padding:0; overflow:hidden; display:flex; flex-direction:column}
+    .workCard{flex:1; display:flex; min-height:0; flex-direction:column}
+    .workCanvasWrap{flex:1; min-height:0; padding:0}
+    #workCanvas{width:100%; height:100%; display:block; background:#fff; touch-action:none}
+    .workFeedbackFrame{
+      flex:0 0 170px; min-height:170px;
+      border-top:1px solid rgba(16,24,40,.08);
+      background:rgba(244,247,252,.96);
+      padding:12px;
+      display:flex; flex-direction:column; gap:10px;
+    }
+    .workFeedbackTitle{font-size:16px; font-weight:1000; color:#111827}
+    .feedback{
+      position:static; min-height:58px; width:100%;
+      margin:0; border-radius:16px; padding:10px 14px;
+      font-size:15px; line-height:1.3; font-weight:1000; display:none;
+      white-space:pre-line; overflow:auto;
+      background:#fff; border:1px solid rgba(16,24,40,.10);
+    }
+    .feedback.good{display:block; background:var(--good); border-color:#b1d7be}
+    .feedback.bad{display:block; background:var(--bad); border-color:#efb8b8}
+
+    .footer{
+      flex:0 0 auto; padding:8px 14px; border-top:1px solid rgba(16,24,40,.08);
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      font-size:11px; font-weight:1000; color:var(--muted)
+    }
+    #confettiCanvas{position:fixed; inset:0; width:100vw; height:100vh; pointer-events:none; z-index:9999;}
+    .rewardPage{
+      width:1220px; height:760px; border-radius:30px; background:#d3dbea; padding:22px;
+      box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);
+      display:none; align-items:center; justify-content:center;
+    }
+    .rewardPage.show{display:flex}
+    .rewardStage{
+      width:min(100%,760px); min-height:540px; border-radius:30px; background:rgba(244,247,252,.96);
+      box-shadow:0 18px 40px rgba(15,23,42,.10); border:1px solid rgba(16,24,40,.08);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+      gap:16px; padding:28px 24px;
+    }
+    .rewardBadge{
+      padding:8px 16px; border-radius:999px; background:#ede9fe; border:1px solid #c4b5fd;
+      color:#6d28d9; font-size:16px; font-weight:1000;
+    }
+    .rewardTitle{font-size:40px; font-weight:1000; color:#0f172a; line-height:1.05;}
+    .rewardSub{font-size:20px; font-weight:1000; color:#475569; max-width:620px; line-height:1.35;}
+    .rewardPetStage{
+      width:min(100%,360px); min-height:280px; border-radius:28px; border:3px dashed #86efac; background:#ecfdf3;
+      box-shadow:0 10px 24px rgba(22,163,74,.12);
+      display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; padding:20px;
+    }
+    .rewardPetEmoji{font-size:96px; line-height:1}
+    .rewardPetName{font-size:32px; font-weight:1000; color:#166534; line-height:1.1}
+    .rewardPetHint{font-size:16px; font-weight:1000; color:#15803d; line-height:1.3}
+    .rewardSparkle{
+      font-size:24px; font-weight:1000; color:#d97706; animation:rewardFloat 1.8s ease-in-out infinite;
+    }
+    @keyframes rewardFloat{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-6px)}
+    }
+
+    @media (max-width:1200px){
+      .main{grid-template-columns:minmax(0,2.05fr) minmax(280px,.78fr)}
+      .questionShell{width:1160px; height:775px}
+      .mainInner{grid-template-columns:570px 1fr}
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="main">
+    <div class="card">
+      <div class="leftBd">
+        <div class="fitViewport" id="fitViewport"><div class="fitStage" id="fitStage">
+          <div class="questionShell" id="questionShell">
+            <div class="boardGrid">
+              <div class="introPanel">
+                <div class="questionTitleBox">
+                  <div>
+                    <div class="questionTitleMain">2-Step Word Problem</div>
+                    <div class="questionTitleSub">Read carefully. Solve step by step.</div>
+                  </div>
+                  <div class="questionTag" id="questionTag">New variation</div>
+                </div>
+                <div class="missionCard">
+                  <div class="missionTop">
+                    <div class="missionTitle" id="missionTitle">Question 1 of 3</div>
+                    <div class="missionMeta" id="missionMeta">3-question mission • 2 more to go</div>
+                  </div>
+                  <div class="missionBar"><div class="missionFill" id="missionFill"></div></div>
+                  <div class="missionBottom">
+                    <div class="streakText" id="streakText">Progress streak: 0 of 3</div>
+                    <div class="streakDots">
+                      <div class="streakDot" id="streak1">⭐</div>
+                      <div class="streakDot" id="streak2">⭐</div>
+                      <div class="streakDot" id="streak3">⭐</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="problemText" id="problemText"></div>
+                <div class="opBank" id="opBank">
+                  <span class="opBankLabel">Click the operation sign:</span>
+                  <span class="opChip" data-op="+">+</span>
+                  <span class="opChip" data-op="−">−</span>
+                  <span class="opChip" data-op="×">×</span>
+                  <span class="opChip" data-op="÷">÷</span>
+                </div>
+              </div>
+
+              <div class="mainPanel">
+                <div class="middleFrame">
+                <div class="mainInner">
+                  <div class="leftSolve">
+                    <div class="modelWrap">
+                      <div class="labelRow">
+                        <div class="moneyLabel" id="topMoneyLabel" style="left:354px;">
+                          <span class="moneyLead">$</span><span class="fixedTag" id="topAmountTag">5.40</span>
+                        </div>
+                      </div>
+
+                      <div class="barArea">
+                        <div class="barText top" id="day1Label">Monday</div>
+                        <div class="barText bottom" id="day2Label">Tuesday</div>
+
+                        <div class="braceTop" id="braceTop"></div>
+                        <div class="braceBottomLeft" id="braceBottomLeft"></div>
+                        <div class="braceBottomRight" id="braceBottomRight"></div>
+                        <div class="braceSide" id="braceSide"></div>
+
+                        <div class="topBar">
+                          <div class="segTopA"></div>
+                          <div class="segTopB"></div>
+                        </div>
+                        <div class="bottomBar">
+                          <div class="segBottom"></div>
+                        </div>
+
+                        <div class="vDash1"></div>
+                        <div class="vDash2"></div>
+
+                        <div class="unknownMark bottomFriday">?</div>
+                        <div class="fixedText diff" id="lessTag">$1.20</div>
+                        <div class="unknownMark sideTotal">?</div>
+                      </div>
+                    </div>
+
+                    <div class="steps">
+                      <div>
+                        <div class="eqBox">
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput" id="eq1a" inputmode="decimal" placeholder="0.00" aria-label="First equation first value"></span>
+                          <span class="opSlot" id="eq1Op">?</span>
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput" id="eq1b" inputmode="decimal" placeholder="0.00" aria-label="First equation second value"></span>
+                          <span>=</span>
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput long" id="eq1ans" inputmode="decimal" placeholder="0.00" aria-label="First equation answer"></span>
+                        </div>
+                        <div class="sentence">
+                          <span id="nameDay2">Amir</span> spent
+                          <span class="moneyInlineSentence"><span class="moneyLead">$</span><input class="blankInput long" id="friSentence" inputmode="decimal" placeholder="0.00" aria-label="Second day sentence answer"></span>
+                          on <span id="day2Sentence">Tuesday</span>.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="rightSolve">
+                    <div class="rightSolveHeader">(ii)</div>
+                    <div class="rightSolvePrompt">
+                      How much did he spend over the two days?
+                    </div>
+                    <div class="rightSolveBottom">
+                      <div>
+                        <div class="eqBox">
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput" id="eq2a" inputmode="decimal" placeholder="0.00" aria-label="Second equation first value"></span>
+                          <span class="opSlot" id="eq2Op">?</span>
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput" id="eq2b" inputmode="decimal" placeholder="0.00" aria-label="Second equation second value"></span>
+                          <span>=</span>
+                          <span class="moneyField"><span class="dollar">$</span><input class="blankInput long" id="eq2ans" inputmode="decimal" placeholder="0.00" aria-label="Second equation answer"></span>
+                        </div>
+                        <div class="sentence">
+                          <span id="pronounTotal">He</span> spent
+                          <span class="moneyInlineSentence"><span class="moneyLead">$</span><input class="blankInput long" id="totalSentence" inputmode="decimal" placeholder="0.00" aria-label="Total sentence answer"></span>
+                          over the two days.
+                        </div>
+                      </div>
+
+                      <div class="controlsFrame">
+                        <div class="controlsFrameInner">
+                          <button class="btn primary" id="btnUnlock" type="button">🔊 Unlock Audio</button>
+                          <button class="btn" id="btnNew" type="button">New Variation</button>
+                          <button class="btn checkYellow" id="btnCheck" type="button">Check Answers</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="rewardPage" id="rewardPage" hidden>
+            <div class="rewardStage">
+              <div class="rewardBadge">⭐ Mission complete</div>
+              <div class="rewardTitle">Your pet reached Stage 3!</div>
+              <div class="rewardSub">You finished all 3 questions.</div>
+              <div class="rewardPetStage">
+                <div class="rewardSparkle">✨ ✨ ✨</div>
+                <div class="rewardPetEmoji">🐥</div>
+                <div class="rewardPetName">Stage 3 Pet</div>
+                <div class="rewardPetHint">So cute!</div>
+              </div>
+              <button class="btn primary" id="btnRewardPlayAgain" type="button">Play Again</button>
+            </div>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="card" id="toolsCard">
+      <div class="cardHd">
+        <div class="h">Working Space</div>
+        <button class="btn" id="btnWorkClearTop" type="button">Clear Working</button>
+      </div>
+      <div id="workPanelBd">
+        <div class="workCard">
+          <div class="workCanvasWrap">
+            <canvas id="workCanvas"></canvas>
+          </div>
+          <div class="workFeedbackFrame">
+            <div class="workFeedbackTitle">Feedback</div>
+            <div class="feedback" id="feedback"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div>Designed by Lim Kim Sze © 2026</div>
+    <div>Two-step word problem layout with right-side working space</div>
+  </div>
+</div>
+
+<canvas id="confettiCanvas"></canvas>
+
+
+<script>
+(function(){
+  'use strict';
+
+  const BAR_START = 178;
+  const TOP_W = 352;
+  const SIDE_BRACE_LEFT = 538;
+
+  const people = [
+    {name:'Amir', pronoun:'He'},
+    {name:'Aiden', pronoun:'He'},
+    {name:'Daniel', pronoun:'He'},
+    {name:'Ethan', pronoun:'He'},
+    {name:'Jayden', pronoun:'He'},
+    {name:'Zavier', pronoun:'He'},
+    {name:'Mia', pronoun:'She'},
+    {name:'Grace', pronoun:'She'},
+    {name:'Sarah', pronoun:'She'},
+    {name:'Hana', pronoun:'She'},
+    {name:'Siti', pronoun:'She'}
+  ];
+  const dayPairs = [
+    ['Monday','Tuesday'],
+    ['Tuesday','Wednesday'],
+    ['Saturday','Sunday'],
+    ['Sunday','Monday']
+  ];
+
+  const els = {
+    problemText: document.getElementById('problemText'),
+    questionTag: document.getElementById('questionTag'),
+    missionTitle: document.getElementById('missionTitle'),
+    missionMeta: document.getElementById('missionMeta'),
+    missionFill: document.getElementById('missionFill'),
+    streakText: document.getElementById('streakText'),
+    streakDots: [1,2,3].map(n=>document.getElementById('streak'+n)),
+    rewardPage: document.getElementById('rewardPage'),
+    btnRewardPlayAgain: document.getElementById('btnRewardPlayAgain'),
+    day1Label: document.getElementById('day1Label'),
+    day2Label: document.getElementById('day2Label'),
+    day2Sentence: document.getElementById('day2Sentence'),
+    nameDay2: document.getElementById('nameDay2'),
+    pronounTotal: document.getElementById('pronounTotal'),
+    topMoneyLabel: document.getElementById('topMoneyLabel'),
+    topAmountTag: document.getElementById('topAmountTag'),
+    lessTag: document.getElementById('lessTag'),
+
+    eq1a: document.getElementById('eq1a'),
+    eq1b: document.getElementById('eq1b'),
+    eq1ans: document.getElementById('eq1ans'),
+    friSentence: document.getElementById('friSentence'),
+    eq2a: document.getElementById('eq2a'),
+    eq2b: document.getElementById('eq2b'),
+    eq2ans: document.getElementById('eq2ans'),
+    totalSentence: document.getElementById('totalSentence'),
+    eq1Op: document.getElementById('eq1Op'),
+    eq2Op: document.getElementById('eq2Op'),
+    feedback: document.getElementById('feedback'),
+    btnCheck: document.getElementById('btnCheck'),
+    btnNew: document.getElementById('btnNew'),
+    btnUnlock: document.getElementById('btnUnlock'),
+    fitViewport: document.getElementById('fitViewport'),
+    fitStage: document.getElementById('fitStage'),
+    questionShell: document.getElementById('questionShell'),
+
+    braceTop: document.getElementById('braceTop'),
+    braceBottomLeft: document.getElementById('braceBottomLeft'),
+    braceBottomRight: document.getElementById('braceBottomRight'),
+    braceSide: document.getElementById('braceSide'),
+    topBar: document.querySelector('.topBar'),
+    bottomBar: document.querySelector('.bottomBar'),
+    segTopA: document.querySelector('.segTopA'),
+    segTopB: document.querySelector('.segTopB'),
+    segBottom: document.querySelector('.segBottom'),
+    vDash1: document.querySelector('.vDash1'),
+    vDash2: document.querySelector('.vDash2'),
+    diffText: document.querySelector('.fixedText.diff'),
+    bottomUnknown: document.querySelector('.unknownMark.bottomFriday'),
+    sideUnknown: document.querySelector('.unknownMark.sideTotal'),
+  };
+
+  const sounds = {
+    ok: new Audio('./correct.mp3'),
+    bad: new Audio('./wrong.mp3'),
+    tada: new Audio('./tada.mp3')
+  };
+  Object.values(sounds).forEach(a=>{ a.preload='auto'; a.playsInline=true; });
+
+  const TOTAL_QUESTIONS = 3;
+  let audioUnlocked = false;
+  let state = null;
+  let solvedCount = 0;
+  let actionMode = 'check';
+
+  async function unlockAudio(){
+    try{
+      for(const a of Object.values(sounds)){
+        a.muted = true;
+        try{ await a.play(); }catch(e){}
+        a.pause(); a.currentTime = 0; a.muted = false;
+      }
+      audioUnlocked = true;
+      els.btnUnlock.textContent = '🔊 Audio Unlocked';
+    }catch(e){}
+  }
+  async function play(name){
+    const a = sounds[name]; if(!a) return;
+    if(!audioUnlocked) await unlockAudio();
+    try{ a.pause(); a.currentTime=0; a.play().catch(()=>{}); }catch(e){}
+  }
+  els.btnUnlock.addEventListener('click', unlockAudio);
+  window.addEventListener('pointerdown', ()=>{ if(!audioUnlocked) unlockAudio(); }, {once:true, passive:true});
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function money(cents){ return (cents/100).toFixed(2); }
+  function parseMoney(v){
+    const s = String(v||'').trim().replace(/\$/g,'');
+    if(!s) return NaN;
+    if(!/^\d+(?:\.\d{1,2})?$/.test(s)) return NaN;
+    return Math.round(parseFloat(s)*100);
+  }
+
+  function braceTopSVG(){
+    return `<svg viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M1 20 C1 8 4 4 12 4 L45 4 C47 4 48.6 4 50 1 C51.4 4 53 4 55 4 L88 4 C96 4 99 8 99 20"/></svg>`;
+  }
+  function braceBottomSVG(){
+    return `<svg viewBox="0 0 100 24" preserveAspectRatio="none"><path d="M1 4 C1 16 4 20 12 20 L45 20 C47 20 48.6 20 50 23 C51.4 20 53 20 55 20 L88 20 C96 20 99 16 99 4"/></svg>`;
+  }
+  function braceSideSVG(){
+    return `<svg viewBox="0 0 24 100" preserveAspectRatio="none"><path d="M4 2 C16 2 20 6 20 14 L20 43 C20 46 20 48 23 50 C20 52 20 54 20 57 L20 86 C20 94 16 98 4 98"/></svg>`;
+  }
+  els.braceTop.innerHTML = braceTopSVG();
+  els.braceBottomLeft.innerHTML = braceBottomSVG();
+  els.braceBottomRight.innerHTML = braceBottomSVG();
+  els.braceSide.innerHTML = braceSideSVG();
+
+  const opState = { one:'', two:'' };
+  function setOp(which, symbol){
+    opState[which] = symbol;
+    const el = which==='one' ? els.eq1Op : els.eq2Op;
+    el.textContent = symbol;
+    el.classList.add('filled');
+  }
+  function clearOp(which){
+    opState[which] = '';
+    const el = which==='one' ? els.eq1Op : els.eq2Op;
+    el.textContent = '?';
+    el.classList.remove('filled');
+  }
+  els.eq1Op.addEventListener('click', ()=>clearOp('one'));
+  els.eq2Op.addEventListener('click', ()=>clearOp('two'));
+  document.querySelectorAll('.opChip').forEach(chip=>{
+    chip.addEventListener('click', ()=>{
+      const op = chip.dataset.op;
+      if(!opState.one) setOp('one', op);
+      else if(!opState.two) setOp('two', op);
+      else setOp('two', op);
+    });
+  });
+
+  function resetInputs(){
+    ['eq1a','eq1b','eq1ans','friSentence','eq2a','eq2b','eq2ans','totalSentence'].forEach(id=>els[id].value='');
+    clearOp('one');
+    clearOp('two');
+    els.feedback.className = 'feedback';
+    els.feedback.textContent = '';
+  }
+
+  function setStylePx(el, styles){
+    Object.entries(styles).forEach(([k,v])=>{ el.style[k] = typeof v === 'number' ? `${v}px` : v; });
+  }
+
+  function showSolvePage(){
+    els.questionShell.style.display = 'grid';
+    els.rewardPage.hidden = true;
+    els.rewardPage.classList.remove('show');
+    els.btnCheck.disabled = false;
+  }
+  function showRewardPage(){
+    els.questionShell.style.display = 'none';
+    els.rewardPage.hidden = false;
+    els.rewardPage.classList.add('show');
+    els.btnCheck.disabled = true;
+    play('tada');
+    requestAnimationFrame(fitToViewport);
+  }
+  function updateMissionUI(){
+    const progress = Math.max(0, Math.min(solvedCount, TOTAL_QUESTIONS));
+    const currentNumber = actionMode === 'reward' ? TOTAL_QUESTIONS : Math.min(progress + 1, TOTAL_QUESTIONS);
+    els.missionTitle.textContent = actionMode === 'reward'
+      ? `Mission complete! ${TOTAL_QUESTIONS} of ${TOTAL_QUESTIONS}`
+      : `Question ${currentNumber} of ${TOTAL_QUESTIONS}`;
+    els.missionFill.style.width = `${(progress / TOTAL_QUESTIONS) * 100}%`;
+    els.streakText.textContent = `Progress streak: ${progress} of ${TOTAL_QUESTIONS}`;
+    els.streakDots.forEach((dot, idx)=>dot.classList.toggle('on', idx < progress));
+    if(actionMode === 'advance'){
+      const remain = TOTAL_QUESTIONS - solvedCount;
+      els.missionMeta.textContent = remain ? `Nice work! ${remain} more to go.` : 'Mission complete!';
+    }else if(actionMode === 'reward'){
+      els.missionMeta.textContent = 'All questions completed. Great job!';
+    }else{
+      const remain = Math.max(0, TOTAL_QUESTIONS - progress - 1);
+      els.missionMeta.textContent = `${TOTAL_QUESTIONS}-question mission • ${remain} more after this question`;
+    }
+  }
+  function difficultyLabelFor(index){
+    return ['Warm-Up Round','Practice Round','Final Challenge'][Math.min(index,2)];
+  }
+
+  function makeVariation(stageIndex = solvedCount){
+    const person = pick(people);
+    const [day1, day2] = pick(dayPairs);
+
+    function randStep(min, max, step){
+      const count = Math.floor((max - min) / step);
+      return min + Math.floor(Math.random() * (count + 1)) * step;
+    }
+
+    let firstDay, less, secondDay, total;
+    while(true){
+      if(stageIndex <= 0){
+        firstDay = randStep(400, 700, 10);   // easier
+        less = randStep(50, 120, 10);
+      }else if(stageIndex === 1){
+        firstDay = randStep(500, 900, 5);    // medium
+        less = randStep(70, 180, 5);
+      }else{
+        firstDay = randStep(700, 1200, 5);   // harder
+        less = randStep(95, 250, 5);
+      }
+      secondDay = firstDay - less;
+      total = firstDay + secondDay;
+      if(secondDay >= 250 && secondDay < firstDay) break;
+    }
+
+    return { person, day1, day2, firstDay, less, secondDay, total, stageIndex };
+  }
+
+  function renderVariant(){
+    els.questionTag.textContent = difficultyLabelFor(solvedCount);
+    updateMissionUI();
+    els.btnNew.textContent = 'Restart Set';
+    els.btnCheck.textContent = actionMode === 'advance' ? 'Next Question' : 'Check Answers';
+    els.problemText.innerHTML = `
+      <div>${state.person.name} spent $${money(state.firstDay)} on ${state.day1}.</div>
+      <div>${state.person.pronoun} spent $${money(state.less)} less on ${state.day2}.</div>
+      <div>How much did ${state.person.pronoun.toLowerCase()} spend over the two days?</div>
+    `;
+    els.day1Label.textContent = state.day1;
+    els.day2Label.textContent = state.day2;
+    els.day2Sentence.textContent = state.day2;
+    els.nameDay2.textContent = state.person.name;
+    els.pronounTotal.textContent = state.person.pronoun;
+    els.topAmountTag.textContent = money(state.firstDay);
+    els.lessTag.textContent = `$${money(state.less)}`;
+
+    const bottomW = Math.round(TOP_W * (state.secondDay / state.firstDay));
+    const diffW = TOP_W - bottomW;
+
+    setStylePx(els.topMoneyLabel, { left: BAR_START + TOP_W/2 });
+    setStylePx(els.braceTop, { left: BAR_START, width: TOP_W });
+    setStylePx(els.topBar, { left: BAR_START, width: TOP_W });
+    setStylePx(els.bottomBar, { left: BAR_START, width: bottomW });
+
+    els.segTopA.style.width = `${bottomW}px`;
+    els.segTopB.style.width = `${diffW}px`;
+    els.segBottom.style.width = `${bottomW}px`;
+
+    setStylePx(els.braceBottomLeft, { left: BAR_START, width: bottomW });
+    setStylePx(els.braceBottomRight, { left: BAR_START + bottomW, width: diffW });
+    setStylePx(els.vDash1, { left: BAR_START + bottomW });
+    setStylePx(els.vDash2, { left: BAR_START + TOP_W });
+    setStylePx(els.bottomUnknown, { left: BAR_START + bottomW/2 });
+    setStylePx(els.diffText, { left: BAR_START + bottomW + diffW/2 });
+    setStylePx(els.sideUnknown, { left: SIDE_BRACE_LEFT + 34 });
+
+    resetInputs();
+    fitToViewport();
+  }
+
+  function fitToViewport(){
+    const vp = els.fitViewport;
+    const stage = els.fitStage;
+    const shell = (!els.rewardPage.hidden && els.rewardPage.classList.contains('show')) ? els.rewardPage : els.questionShell;
+    if(!vp || !stage || !shell) return;
+    const vw = vp.clientWidth;
+    const vh = vp.clientHeight;
+    const sw = shell.offsetWidth;
+    const sh = shell.offsetHeight;
+    const scale = Math.min(vw/sw, vh/sh);
+    stage.style.transform = `scale(${scale})`;
+    stage.style.left = Math.max(0, (vw - sw*scale)/2) + 'px';
+    stage.style.top = Math.max(0, (vh - sh*scale)/2) + 'px';
+  }
+
+  const confetti = {
+    canvas: document.getElementById('confettiCanvas'),
+    ctx: null, w: 0, h: 0, parts: [], until: 0, raf: 0
+  };
+  if(confetti.canvas) confetti.ctx = confetti.canvas.getContext('2d');
+  function resizeConfetti(){
+    if(!confetti.canvas || !confetti.ctx) return;
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+    confetti.w = Math.floor(window.innerWidth * dpr);
+    confetti.h = Math.floor(window.innerHeight * dpr);
+    confetti.canvas.width = confetti.w;
+    confetti.canvas.height = confetti.h;
+    confetti.canvas.style.width = '100vw';
+    confetti.canvas.style.height = '100vh';
+  }
+  function fireConfetti(){
+    if(!confetti.canvas || !confetti.ctx) return;
+    resizeConfetti();
+    const now = performance.now();
+    confetti.until = now + 1600;
+    for(let i=0;i<160;i++){
+      const size = 6 + Math.random()*8;
+      confetti.parts.push({
+        x: confetti.w * (0.12 + Math.random()*0.76),
+        y: confetti.h * (0.02 + Math.random()*0.16),
+        vx: (Math.random()*2 - 1) * 6,
+        vy: -2 - Math.random()*5,
+        g: 0.18 + Math.random()*0.2,
+        r: size, rot: Math.random()*Math.PI, vr: (Math.random()*2 - 1) * 0.2, life: 0
+      });
+    }
+    if(confetti.raf) return;
+    const step = (t)=>{
+      const ctx = confetti.ctx;
+      ctx.clearRect(0,0,confetti.w,confetti.h);
+      confetti.parts = confetti.parts.filter(p => p.y < confetti.h + 200 && p.life < 260);
+      for(const p of confetti.parts){
+        p.vy += p.g; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life += 1;
+        ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+        const hue = (p.life*7 + (p.x+p.y)*0.002) % 360;
+        ctx.fillStyle = `hsl(${hue} 95% 60%)`;
+        ctx.fillRect(-p.r/2, -p.r/4, p.r, p.r/2);
+        ctx.restore();
+      }
+      if(t < confetti.until || confetti.parts.length){
+        confetti.raf = requestAnimationFrame(step);
+      }else{
+        cancelAnimationFrame(confetti.raf);
+        confetti.raf = 0;
+        ctx.clearRect(0,0,confetti.w,confetti.h);
+      }
+    };
+    confetti.raf = requestAnimationFrame(step);
+  }
+
+  function showFeedback(text, ok){
+    els.feedback.className = 'feedback ' + (ok ? 'good' : 'bad');
+    els.feedback.textContent = text;
+  }
+
+  function check(){
+    if(actionMode === 'advance'){
+      actionMode = 'check';
+      showSolvePage();
+      state = makeVariation(solvedCount);
+      renderVariant();
+      return;
+    }
+
+    const eq1a = parseMoney(els.eq1a.value);
+    const eq1b = parseMoney(els.eq1b.value);
+    const eq1ans = parseMoney(els.eq1ans.value);
+    const day2Sentence = parseMoney(els.friSentence.value);
+
+    const eq2a = parseMoney(els.eq2a.value);
+    const eq2b = parseMoney(els.eq2b.value);
+    const eq2ans = parseMoney(els.eq2ans.value);
+    const totalSentence = parseMoney(els.totalSentence.value);
+
+    const firstOK =
+      eq1a === state.firstDay &&
+      opState.one === '−' &&
+      eq1b === state.less &&
+      eq1ans === state.secondDay &&
+      day2Sentence === state.secondDay;
+
+    const secondAddCommutes =
+      ((eq2a === state.firstDay && eq2b === state.secondDay) || (eq2a === state.secondDay && eq2b === state.firstDay)) &&
+      opState.two === '+' &&
+      eq2ans === state.total &&
+      totalSentence === state.total;
+
+    const ok = firstOK && secondAddCommutes;
+
+    if(ok){
+      play('ok');
+      fireConfetti();
+      showFeedback(`Well done! ${state.person.name} spent $${money(state.secondDay)} on ${state.day2}.
+${state.person.pronoun} spent $${money(state.total)} over the two days.`, true);
+      solvedCount += 1;
+      if(solvedCount >= TOTAL_QUESTIONS){
+        actionMode = 'reward';
+        updateMissionUI();
+        setTimeout(showRewardPage, 320);
+      }else{
+        actionMode = 'advance';
+        updateMissionUI();
+        els.btnCheck.textContent = 'Next Question';
+      }
+    }else{
+      play('bad');
+      showFeedback(`Check again.
+Step 1: $${money(state.firstDay)} − $${money(state.less)} = ${state.day2}.
+Step 2: ${state.day1} + ${state.day2} = total.`, false);
+    }
+  }
+
+  function restartSet(){
+    solvedCount = 0;
+    actionMode = 'check';
+    showSolvePage();
+    state = makeVariation(0);
+    renderVariant();
+  }
+
+  els.btnNew.addEventListener('click', restartSet);
+  els.btnCheck.addEventListener('click', check);
+  els.btnRewardPlayAgain.addEventListener('click', restartSet);
+
+  window.addEventListener('resize', ()=>{ fitToViewport(); resizeConfetti(); });
+  window.addEventListener('load', ()=>{ fitToViewport(); resizeConfetti(); });
+
+  /* Working canvas */
+  const canvas = document.getElementById('workCanvas');
+  const ctx = canvas.getContext('2d');
+  let drawing = false, last = null;
+  function resizeCanvas(){
+    const rect = canvas.getBoundingClientRect();
+    const dpr = Math.max(1, Math.min(2, window.devicePixelRatio||1));
+    const snapshot = document.createElement('canvas');
+    snapshot.width = canvas.width || 1;
+    snapshot.height = canvas.height || 1;
+    const sctx = snapshot.getContext('2d');
+    if(canvas.width && canvas.height) sctx.drawImage(canvas,0,0);
+    canvas.width = Math.max(1, Math.round(rect.width*dpr));
+    canvas.height = Math.max(1, Math.round(rect.height*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.lineCap='round'; ctx.lineJoin='round'; ctx.lineWidth=4; ctx.strokeStyle='#0f172a';
+    ctx.clearRect(0,0,rect.width,rect.height);
+    if(snapshot.width>1 && snapshot.height>1){
+      ctx.drawImage(snapshot,0,0,rect.width,rect.height);
+    }
+  }
+  function point(e){
+    const r = canvas.getBoundingClientRect();
+    if(e.touches && e.touches[0]) return {x:e.touches[0].clientX-r.left, y:e.touches[0].clientY-r.top};
+    return {x:e.clientX-r.left, y:e.clientY-r.top};
+  }
+  function startDraw(e){ drawing=true; last=point(e); e.preventDefault(); }
+  function moveDraw(e){ if(!drawing) return; const p=point(e); ctx.beginPath(); ctx.moveTo(last.x,last.y); ctx.lineTo(p.x,p.y); ctx.stroke(); last=p; e.preventDefault(); }
+  function endDraw(){ drawing=false; last=null; }
+  canvas.addEventListener('mousedown', startDraw);
+  canvas.addEventListener('mousemove', moveDraw);
+  window.addEventListener('mouseup', endDraw);
+  canvas.addEventListener('touchstart', startDraw, {passive:false});
+  canvas.addEventListener('touchmove', moveDraw, {passive:false});
+  window.addEventListener('touchend', endDraw, {passive:false});
+  document.getElementById('btnWorkClearTop').addEventListener('click', ()=>{
+    const r = canvas.getBoundingClientRect();
+    ctx.clearRect(0,0,r.width,r.height);
+  });
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(()=>{ resizeCanvas(); fitToViewport(); resizeConfetti(); }, 50);
+
+  restartSet();
+})();
+</script>
+
+</body>
+</html>
