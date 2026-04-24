@@ -418,8 +418,8 @@
   <style>
     .back-main-btn{
       position: fixed;
-      right: max(8px, env(safe-area-inset-right));
-      bottom: max(8px, env(safe-area-inset-bottom));
+      right: max(20px, env(safe-area-inset-right));
+      bottom: calc(max(18px, env(safe-area-inset-bottom)) + 8px);
       z-index: 2147483647;
       padding: 4px 8px;
       font-size: 11px;
@@ -446,11 +446,12 @@
     }
   </style>
 
+
   <script>
-  /* Monster Quest Destroy-and-Reload Return Fix
-     - Manual Back: tells the main hub to close/destroy the iframe.
-     - Fallback: if opened outside the hub, go to the main page with a fresh URL.
-     - Does NOT save/unlock progress for manual back. Progress is saved only by monster-quest-stage-complete.
+  /* Monster Quest Destroy-and-Reload Return Fix v2
+     Manual Back: tells the main hub to close/destroy the iframe and does NOT force top navigation while inside the hub.
+     Direct Open fallback: if opened outside the hub, goes to the main page with a fresh URL.
+     Progress is saved only by monster-quest-stage-complete, not manual back.
   */
   (function(){
     const STAGE_NUMBER = 3;
@@ -466,6 +467,7 @@
     }
 
     window.__returnToMonsterQuestMain = function(reason){
+      const inHub = !!(window.parent && window.parent !== window);
       const target = buildReturnUrl(reason || 'manual');
       const btn = document.querySelector('.back-main-btn');
       if(btn){
@@ -473,30 +475,25 @@
         btn.setAttribute('target', '_top');
       }
 
-      try{
-        if(window.parent && window.parent !== window){
+      if(inHub){
+        try{
           window.parent.postMessage({
             type: 'monster-quest-return-main',
             reason: reason || 'manual-back',
             source: 'stage-' + STAGE_NUMBER,
+            stage: STAGE_NUMBER,
             ts: Date.now()
           }, '*');
-        }
-      }catch(e){}
+          return false;
+        }catch(e){}
+      }
 
-      setTimeout(function(){
-        try{
-          if(window.top && window.top !== window){
-            window.top.location.replace(target);
-          }else{
-            window.location.replace(target);
-          }
-        }catch(e){
-          try{ window.open(target, '_top'); }
-          catch(e2){ window.location.href = target; }
-        }
-      }, 120);
-
+      try{
+        window.location.replace(target);
+      }catch(e){
+        try{ window.open(target, '_top'); }
+        catch(e2){ window.location.href = target; }
+      }
       return false;
     };
 
@@ -527,7 +524,8 @@
 <a class="back-main-btn"
    href="https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?mq_return=stage3"
    target="_top"
-   data-stage-return="3">
+   data-stage-return="3"
+   onclick="return window.__returnToMonsterQuestMain ? window.__returnToMonsterQuestMain('manual-back') : true;">
   Back to Main Page
 </a>
 
@@ -840,14 +838,12 @@
           stage: stageNumber,
           nextStage: Math.min(8, stageNumber + 1)
         }, '*');
+        return;
       }
     } catch (e) {}
 
-    // Fallback only when this stage is opened directly outside the main hub.
     try {
-      if (!window.parent || window.parent === window) {
-        window.location.href = 'https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?completed=' + stageNumber + '&ts=' + Date.now();
-      }
+      window.location.replace('https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?completed=' + stageNumber + '&ts=' + Date.now());
     } catch (e) {}
   }
 
