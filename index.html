@@ -446,10 +446,88 @@
     }
   </style>
 
+  <script>
+  /* Monster Quest Destroy-and-Reload Return Fix
+     - Manual Back: tells the main hub to close/destroy the iframe.
+     - Fallback: if opened outside the hub, go to the main page with a fresh URL.
+     - Does NOT save/unlock progress for manual back. Progress is saved only by monster-quest-stage-complete.
+  */
+  (function(){
+    const STAGE_NUMBER = 3;
+    const MONSTER_QUEST_MAIN_URL = 'https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/';
+
+    function buildReturnUrl(reason){
+      const qs = new URLSearchParams({
+        mq_return: 'stage' + STAGE_NUMBER,
+        reason: reason || 'manual',
+        ts: String(Date.now())
+      });
+      return MONSTER_QUEST_MAIN_URL + '?' + qs.toString();
+    }
+
+    window.__returnToMonsterQuestMain = function(reason){
+      const target = buildReturnUrl(reason || 'manual');
+      const btn = document.querySelector('.back-main-btn');
+      if(btn){
+        btn.setAttribute('href', target);
+        btn.setAttribute('target', '_top');
+      }
+
+      try{
+        if(window.parent && window.parent !== window){
+          window.parent.postMessage({
+            type: 'monster-quest-return-main',
+            reason: reason || 'manual-back',
+            source: 'stage-' + STAGE_NUMBER,
+            ts: Date.now()
+          }, '*');
+        }
+      }catch(e){}
+
+      setTimeout(function(){
+        try{
+          if(window.top && window.top !== window){
+            window.top.location.replace(target);
+          }else{
+            window.location.replace(target);
+          }
+        }catch(e){
+          try{ window.open(target, '_top'); }
+          catch(e2){ window.location.href = target; }
+        }
+      }, 120);
+
+      return false;
+    };
+
+    function prepareBackLink(evt){
+      const btn = evt.target && evt.target.closest ? evt.target.closest('.back-main-btn') : null;
+      if(!btn) return;
+      btn.setAttribute('href', buildReturnUrl('manual'));
+      btn.setAttribute('target', '_top');
+    }
+
+    document.addEventListener('pointerdown', prepareBackLink, true);
+    document.addEventListener('touchstart', prepareBackLink, true);
+    document.addEventListener('click', function(evt){
+      const btn = evt.target && evt.target.closest ? evt.target.closest('.back-main-btn') : null;
+      if(!btn) return;
+      try{
+        evt.preventDefault();
+        evt.stopPropagation();
+        evt.stopImmediatePropagation();
+      }catch(e){}
+      return window.__returnToMonsterQuestMain('manual-back');
+    }, true);
+  })();
+  </script>
+
 </head>
 <body>
 <a class="back-main-btn"
-   href="https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/">
+   href="https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?mq_return=stage3"
+   target="_top"
+   data-stage-return="3">
   Back to Main Page
 </a>
 
@@ -762,18 +840,14 @@
           stage: stageNumber,
           nextStage: Math.min(8, stageNumber + 1)
         }, '*');
-        return;
       }
     } catch (e) {}
 
+    // Fallback only when this stage is opened directly outside the main hub.
     try {
-      const hubCandidates = [
-        './monster-quest-stage-hub-return-to-map.html?completed=' + stageNumber,
-        './monster-quest-stage-hub.html?completed=' + stageNumber,
-        '../monster-quest-stage-hub-return-to-map.html?completed=' + stageNumber,
-        '../monster-quest-stage-hub.html?completed=' + stageNumber
-      ];
-      window.location.href = hubCandidates[0];
+      if (!window.parent || window.parent === window) {
+        window.location.href = 'https://limkimsze-maker.github.io/P3_More_Word_Problems_Monster_Quest_Main_Page/?completed=' + stageNumber + '&ts=' + Date.now();
+      }
     } catch (e) {}
   }
 
