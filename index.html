@@ -732,11 +732,38 @@
   }
 
   html.mq-stage3-phone .eqBox{
+    width:100% !important;
     max-width:100% !important;
-    flex-wrap:wrap !important;
-    justify-content:flex-start !important;
-    gap:8px !important;
-    font-size:19px !important;
+    flex-wrap:nowrap !important;
+    justify-content:center !important;
+    gap:4px !important;
+    padding:10px 8px !important;
+    font-size:17px !important;
+    overflow-x:auto !important;
+    -webkit-overflow-scrolling:touch !important;
+  }
+  html.mq-stage3-phone .eqBox .moneyField{
+    flex:0 0 auto !important;
+    gap:2px !important;
+  }
+  html.mq-stage3-phone .eqBox .moneyField .dollar{
+    min-width:10px !important;
+    font-size:17px !important;
+  }
+  html.mq-stage3-phone .eqBox .blankInput{
+    width:60px !important;
+    height:38px !important;
+    padding:0 4px !important;
+    font-size:16px !important;
+  }
+  html.mq-stage3-phone .eqBox .blankInput.long{
+    width:76px !important;
+  }
+  html.mq-stage3-phone .eqBox .opSlot{
+    width:34px !important;
+    height:34px !important;
+    flex:0 0 34px !important;
+    font-size:18px !important;
   }
 
   html.mq-stage3-phone .sentence,
