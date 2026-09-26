@@ -1202,6 +1202,128 @@
       }
     }
   </style>
+
+<style id="stage3-mobile-polish-20260926">
+  html.mq-stage3-phone .leftSolve,
+  html.mq-stage3-phone .rightSolve{
+    overflow:hidden !important;
+  }
+
+  html.mq-stage3-phone .rightSolve{
+    padding:12px 10px !important;
+  }
+
+  /* Fit the model to the real phone card width. JS sets the scale. */
+  html.mq-stage3-phone .modelWrap{
+    width:600px !important;
+    max-width:none !important;
+    height:270px !important;
+    transform-origin:top left !important;
+    overflow:visible !important;
+  }
+
+  /* Five stable columns: amount, operator, amount, equals, answer.
+     This keeps every money field inside the phone frame. */
+  html.mq-stage3-phone .eqBox{
+    display:grid !important;
+    grid-template-columns:
+      minmax(0,1fr)
+      32px
+      minmax(0,1fr)
+      16px
+      minmax(0,1.08fr) !important;
+    align-items:center !important;
+    justify-items:stretch !important;
+    width:100% !important;
+    max-width:100% !important;
+    gap:3px !important;
+    padding:10px 7px !important;
+    overflow:hidden !important;
+    font-size:16px !important;
+  }
+
+  html.mq-stage3-phone .eqBox > span{
+    min-width:0 !important;
+  }
+
+  html.mq-stage3-phone .eqBox .moneyField{
+    width:100% !important;
+    min-width:0 !important;
+    display:flex !important;
+    align-items:center !important;
+    gap:2px !important;
+  }
+
+  html.mq-stage3-phone .eqBox .moneyField .dollar{
+    flex:0 0 10px !important;
+    min-width:10px !important;
+    width:10px !important;
+    font-size:16px !important;
+    text-align:center !important;
+  }
+
+  html.mq-stage3-phone .eqBox .blankInput,
+  html.mq-stage3-phone .eqBox .blankInput.long{
+    flex:1 1 auto !important;
+    width:calc(100% - 12px) !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:38px !important;
+    padding:0 2px !important;
+    font-size:15px !important;
+  }
+
+  html.mq-stage3-phone .eqBox .opSlot{
+    width:32px !important;
+    min-width:32px !important;
+    height:32px !important;
+    flex:0 0 32px !important;
+    font-size:17px !important;
+  }
+
+  html.mq-stage3-phone .sentence{
+    font-size:19px !important;
+    line-height:1.35 !important;
+    margin-top:8px !important;
+  }
+
+  html.mq-stage3-phone .moneyInlineSentence{
+    max-width:150px !important;
+  }
+
+  html.mq-stage3-phone .moneyInlineSentence .blankInput.long{
+    width:112px !important;
+    max-width:112px !important;
+    height:40px !important;
+    font-size:16px !important;
+  }
+
+  html.mq-stage3-phone .rightSolvePrompt{
+    font-size:20px !important;
+    line-height:1.3 !important;
+    margin-bottom:8px !important;
+  }
+
+  html.mq-stage3-phone .controlsFrameInner{
+    gap:6px !important;
+  }
+
+  html.mq-stage3-phone .controlsFrameInner .btn{
+    min-width:0 !important;
+    padding:9px 8px !important;
+    font-size:12px !important;
+  }
+
+  html.mq-stage3-phone .back-main-btn{
+    right:6px !important;
+    bottom:calc(78px + env(safe-area-inset-bottom)) !important;
+    padding:4px 7px !important;
+    font-size:9px !important;
+    border-width:1.5px !important;
+    opacity:.78 !important;
+    box-shadow:0 2px 6px rgba(0,0,0,.14) !important;
+  }
+</style>
 </head>
 <body>
 <a class="back-main-btn"
@@ -1704,6 +1826,24 @@
     fitToViewport();
   }
 
+  function fitStage3ModelForPhone(){
+    if(!document.documentElement.classList.contains('mq-stage3-phone')) return;
+    const model=document.querySelector('.modelWrap');
+    const holder=model && model.parentElement;
+    if(!model || !holder) return;
+
+    const available=Math.max(260, holder.getBoundingClientRect().width - 4);
+    const baseWidth=600;
+    const scale=Math.min(0.58, Math.max(0.44, available/baseWidth));
+    const visibleWidth=baseWidth*scale;
+    const left=Math.max(0,(available-visibleWidth)/2);
+
+    model.style.setProperty('transform', `scale(${scale})`, 'important');
+    model.style.setProperty('margin-left', `${Math.round(left)}px`, 'important');
+    model.style.setProperty('margin-right','0','important');
+    model.style.setProperty('margin-bottom', `${Math.round(270*scale-270+16)}px`, 'important');
+  }
+
   function fitToViewport(){
     const vp = els.fitViewport;
     const stage = els.fitStage;
@@ -1714,6 +1854,7 @@
       stage.style.transform = 'none';
       stage.style.left = '0px';
       stage.style.top = '0px';
+      fitStage3ModelForPhone();
       return;
     }
 
@@ -1860,7 +2001,7 @@ Step 2: ${state.day1} + ${state.day2} = total.`, false);
   els.btnCheck.addEventListener('click', check);
   els.btnRewardPlayAgain.addEventListener('click', ()=>signalStageComplete(3));
 
-  window.addEventListener('resize', ()=>{ fitToViewport(); resizeConfetti(); });
+  window.addEventListener('resize', ()=>{ fitToViewport(); fitStage3ModelForPhone(); resizeConfetti(); });
   window.addEventListener('load', ()=>{ fitToViewport(); resizeConfetti(); });
 
   /* Working canvas */
