@@ -627,8 +627,7 @@
     transform-origin:top left !important;
   }
 
-  html.mq-stage3-phone .questionShell,
-  html.mq-stage3-phone .rewardPage{
+  html.mq-stage3-phone .questionShell{
     width:100% !important;
     max-width:100% !important;
     height:auto !important;
@@ -637,6 +636,24 @@
     display:block !important;
     overflow:visible !important;
     border-radius:22px !important;
+  }
+
+  html.mq-stage3-phone .rewardPage{
+    width:100% !important;
+    max-width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    padding:8px !important;
+    overflow:visible !important;
+    border-radius:22px !important;
+  }
+
+  html.mq-stage3-phone .rewardPage[hidden]{
+    display:none !important;
+  }
+
+  html.mq-stage3-phone .rewardPage:not([hidden]){
+    display:block !important;
   }
 
   html.mq-stage3-phone .boardGrid{
